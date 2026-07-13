@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "created_by": "init_scan_state.py",
+    "created_at": "2026-07-13T12:13:13.381652+00:00",
+    "description": "Shared state file for Ctrl+Alt+Delulu vulnerability scanner. All 6 parts read and write to this file. Do not edit manually."
+  },
+  "project": {
+    "name": "ctrl-alt-delulu-scanner",
+    "path": "/workspaces/ctrl-alt-delulu",
+    "started": "",
+    "ended": "",
+    "languages": [],
+    "packages": {}
+  },
+  "findings": [
+    {
+      "id": "F-0001",
+      "rule_id": "core.rules.hardcoded-secret",
+      "type": "secret",
+      "severity": "High",
+      "message": "Hardcoded API key / secret detected. Secrets should never be committed to source code.",
+      "file_path": "sample_target/app.py",
+      "start_line": 6,
+      "end_line": 6,
+      "code_snippet": "API_KEY = \"sk-live-51H8x2eZvKYlo2CJ9x7aBcDeFgHiJkLmNoPqRsT\"",
+      "status": "open",
+      "source": "core-scanner",
+      "explanation": {
+        "rule_id": "core.rules.hardcoded-secret",
+        "file_path": "sample_target/app.py",
+        "start_line": 6,
+        "plain_summary": "The code contains a hardcoded API key, which is a secret that should not be stored in the source code. This means that anyone with access to the code can see the API key.",
+        "why_it_matters": "If an attacker gets access to the code, they can use the hardcoded API key to access the API, potentially causing unauthorized actions or data breaches.",
+        "how_to_fix": "To fix this, replace the hardcoded API key with an environment variable or a secure secrets management system. For example, you can store the API key in a separate file or a secrets manager like AWS Secrets Manager, and then load it into your code using the secrets manager's API.",
+        "severity_plain": "High"
+      },
+      "metadata": {
+        "category": "security",
+        "cwe": "CWE-798: Use of Hard-coded Credentials",
+        "references": [
+          "https://owasp.org/www-community/vulnerabilities/Use_of_hard-coded_password"
+        ]
+      }
+    },
+    {
+      "id": "F-0002",
+      "rule_id": "core.rules.os-system-command-injection",
+      "type": "vulnerability",
+      "severity": "High",
+      "message": "Possible Command Injection: os.system() called with concatenated/untrusted input.",
+      "file_path": "sample_target/app.py",
+      "start_line": 18,
+      "end_line": 18,
+      "code_snippet": "os.system(\"tar -czf backup.tar.gz \" + filename)",
+      "status": "open",
+      "source": "core-scanner",
+      "explanation": {
+        "rule_id": "core.rules.os-system-command-injection",
+        "file_path": "sample_target/app.py",
+        "start_line": 18,
+        "plain_summary": "The code is using the 'os.system()' function with user input, which could allow an attacker to execute arbitrary system commands.",
+        "why_it_matters": "If an attacker can manipulate the 'filename' variable, they could potentially execute any system command, leading to data loss, system compromise, or other security issues.",
+        "how_to_fix": "To fix this, replace the 'os.system()' call with a safer method, such as using the 'shutil' module to create and extract archives. For example, you can use 'shutil.make_archive()' to create an archive and 'shutil.unpack_archive()' to extract it.",
+        "severity_plain": "High"
+      },
+      "metadata": {
+        "category": "security",
+        "cwe": "CWE-78: OS Command Injection",
+        "references": [
+          "https://owasp.org/www-community/attacks/Command_Injection"
+        ]
+      }
+    }
+  ],
+  "stats": {
+    "total": 2,
+    "fixed": 0,
+    "open": 2,
+    "by_type": {
+      "vulnerability": 1,
+      "typosquatting": 0,
+      "secret": 1
+    },
+    "by_severity": {
+      "critical": 0,
+      "high": 2,
+      "medium": 0,
+      "low": 0
+    }
+  }
+}
