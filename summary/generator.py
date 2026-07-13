@@ -394,6 +394,7 @@ def write_html_card(summary, output_dir="."):
 <meta charset="UTF-8">
 <title>Ctrl+Alt+Delulu — Project Summary</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   *{{box-sizing:border-box;margin:0;padding:0}}
   body{{background:#0D0B1E;color:#E8E5FF;font-family:'Inter',system-ui,sans-serif;
@@ -410,9 +411,31 @@ def write_html_card(summary, output_dir="."):
   .stat{{background:#141230;border-radius:6px;padding:12px;text-align:center}}
   .stat-n{{font-family:'Press Start 2P',monospace;font-size:18px;margin-bottom:5px}}
   .stat-l{{font-size:10px;color:#7B78A8}}
+  .dl-btn{{display:inline-flex;align-items:center;gap:8px;background:#9B6FFF;
+            color:#0D0B1E;font-family:'Press Start 2P',monospace;font-size:8px;
+            border:none;border-radius:6px;padding:10px 16px;cursor:pointer;margin-bottom:18px}}
+  .dl-btn:hover{{background:#b494ff}}
+  @media print{{.dl-btn{{display:none}}}}
 </style>
+<script>
+function downloadPDF() {{
+  var btn = document.querySelector('.dl-btn');
+  btn.style.display = 'none';
+  var opt = {{
+    margin: 8,
+    filename: 'project-summary.pdf',
+    image: {{type:'jpeg',quality:0.98}},
+    html2canvas: {{scale:2, backgroundColor:'#0D0B1E', useCORS:true}},
+    jsPDF: {{unit:'mm',format:'a4',orientation:'portrait'}}
+  }};
+  html2pdf().set(opt).from(document.getElementById('summary-content')).save()
+    .then(function(){{ btn.style.display = ''; }});
+}}
+</script>
 </head>
 <body>
+<button class="dl-btn" onclick="downloadPDF()">&#11015; Download PDF</button>
+<div id="summary-content">
 
 <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px">
   <div style="background:#9B6FFF;width:26px;height:26px;border-radius:5px;
@@ -526,6 +549,7 @@ def write_html_card(summary, output_dir="."):
   <span style="color:#7B78A8;font-size:7px">three women. one scanner. zero jargon.</span>
 </div>
 
+</div>
 </body>
 </html>"""
 
@@ -534,6 +558,39 @@ def write_html_card(summary, output_dir="."):
 
     print(f"[summary] HTML  → {path}")
     return path
+
+# ── Output: PDF (optional — needs weasyprint) ────────────────────────────────
+
+def write_pdf(html_path, output_dir="."):
+    """
+    Converts project-summary.html to project-summary.pdf using WeasyPrint.
+    Fully preserves the dark theme and colours.
+
+    Install WeasyPrint once:
+        pip install weasyprint
+
+    Skips gracefully if WeasyPrint is not installed — HTML card still works.
+    """
+    try:
+        from weasyprint import HTML, CSS
+        path = os.path.join(output_dir, "project-summary.pdf")
+        HTML(filename=html_path).write_pdf(
+            path,
+            stylesheets=[CSS(string="""
+                @page { size: A4; margin: 8mm; }
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                .dl-btn { display: none !important; }
+            """)]
+        )
+        print(f"[summary] PDF   → {path}")
+        return path
+    except ImportError:
+        print("[summary] PDF skipped — WeasyPrint not installed.")
+        print("[summary] To enable: pip install weasyprint")
+        return None
+    except Exception as e:
+        print(f"[summary] PDF generation failed: {e}")
+        return None
 
 # ── Update state with end info ────────────────────────────────────────────────
 
@@ -573,7 +630,8 @@ def run_summary(state_path="scan-state.json", project_path=".", output_dir="."):
 
     write_json(summary, output_dir)
     write_text_card(summary, output_dir)
-    write_html_card(summary, output_dir)
+    html_path = write_html_card(summary, output_dir)
+    write_pdf(html_path, output_dir)
 
     s = summary["security"]
     print(f"""
@@ -584,7 +642,8 @@ def run_summary(state_path="scan-state.json", project_path=".", output_dir="."):
   Languages      : {', '.join(languages) or 'none'}
   Packages       : {len(packages)}
 
-  Open project-summary.html in your browser for the full styled card.
+  Open project-summary.html in your browser for the full card.
+  Click the purple Download PDF button to save as PDF.
 """)
 
     return summary

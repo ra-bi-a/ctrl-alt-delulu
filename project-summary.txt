@@ -1,0 +1,47 @@
+========================================================
+  CTRL+ALT+DELULU — PROJECT SUMMARY CARD
+========================================================
+  Project   : ctrl-alt-delulu-scanner
+  Generated : 2026-07-13
+  Path      : /workspaces/ctrl-alt-delulu
+
+  ── TECH STACK ──────────────────────────────────────
+
+  Languages detected:
+    • Python
+
+  Packages: 6 total
+    • semgrep: see requirements.txt
+    • openai: see requirements.txt
+    • anthropic: see requirements.txt
+    • python-dotenv: see requirements.txt
+    • requests: see requirements.txt
+    • python-Levenshtein: see requirements.txt
+
+  ── SECURITY SUMMARY ────────────────────────────────
+
+  Security Score : 70/100  (NEEDS ATTENTION)
+  Total findings : 2
+  Fixed          : 0
+  Still open     : 2
+  Dismissed      : 0
+
+  By type:
+    Vulnerabilities : 1
+    Typosquatting   : 0
+    Secrets exposed : 1
+
+  By severity:
+    Critical : 0
+    High     : 2
+    Medium   : 0
+    Low      : 0
+
+  Found by:
+    Core Scanner  : 2 findings
+    Pkg Checker   : 0 findings
+    Paste Guard   : 0 findings
+
+========================================================
+  ctrl+alt+delulu  ✦  three women. one scanner. zero jargon.
+========================================================

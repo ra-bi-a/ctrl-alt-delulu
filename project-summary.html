@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ctrl+Alt+Delulu — Project Summary</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0D0B1E;color:#E8E5FF;font-family:'Inter',system-ui,sans-serif;
+        font-size:12px;line-height:1.6;padding:20px}
+  .card{background:#1C1A35;border:1px solid rgba(155,111,255,0.2);
+         border-radius:8px;padding:16px;margin-bottom:14px}
+  .sec-t{font-family:'Press Start 2P',monospace;font-size:8px;color:#00D9FF;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse}
+  th{font-family:'Press Start 2P',monospace;font-size:7px;color:#7B78A8;
+      text-align:left;padding:7px 10px;border-bottom:1px solid rgba(155,111,255,0.2);
+      background:#141230}
+  td{padding:7px 10px;border-bottom:1px solid rgba(155,111,255,0.08);vertical-align:top}
+  .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+  .stat{background:#141230;border-radius:6px;padding:12px;text-align:center}
+  .stat-n{font-family:'Press Start 2P',monospace;font-size:18px;margin-bottom:5px}
+  .stat-l{font-size:10px;color:#7B78A8}
+</style>
+</head>
+<body>
+
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:20px">
+  <div style="background:#9B6FFF;width:26px;height:26px;border-radius:5px;
+       display:flex;align-items:center;justify-content:center;
+       font-family:'Press Start 2P',monospace;font-size:9px;color:#0D0B1E">X</div>
+  <div style="background:#FF2D8B;width:26px;height:26px;border-radius:5px;
+       display:flex;align-items:center;justify-content:center;
+       font-family:'Press Start 2P',monospace;font-size:9px;color:#0D0B1E">A</div>
+  <div style="background:#00D9FF;width:26px;height:26px;border-radius:5px;
+       display:flex;align-items:center;justify-content:center;
+       font-family:'Press Start 2P',monospace;font-size:9px;color:#0D0B1E">O</div>
+  <div>
+    <div style="font-family:'Press Start 2P',monospace;font-size:11px;color:#9B6FFF">
+        PROJECT SUMMARY CARD</div>
+    <div style="font-size:10px;color:#7B78A8;margin-top:3px">
+        ctrl-alt-delulu-scanner &nbsp;·&nbsp; 2026-07-13</div>
+  </div>
+</div>
+
+<div class="card" style="border-left:3px solid #FFD700">
+  <div class="sec-t">✦ SECURITY SCORE</div>
+  <div style="display:flex;align-items:center;gap:20px">
+    <div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:28px;
+                  color:#FFD700">70</div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:9px;
+                  color:#FFD700;margin-top:5px">NEEDS ATTENTION</div>
+    </div>
+    <div class="grid4" style="flex:1">
+      <div class="stat">
+        <div class="stat-n" style="color:#E8E5FF">2</div>
+        <div class="stat-l">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n" style="color:#00FF88">0</div>
+        <div class="stat-l">Fixed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n" style="color:#FF2D8B">2</div>
+        <div class="stat-l">Open</div>
+      </div>
+      <div class="stat">
+        <div class="stat-n" style="color:#7B78A8">0</div>
+        <div class="stat-l">Dismissed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+  <div class="card">
+    <div class="sec-t">✦ BY TYPE</div>
+    <table>
+      <tr><td style="color:#C8C5F0">Vulnerabilities</td>
+          <td style="color:#FF2D8B;font-weight:600;text-align:right">
+              1</td></tr>
+      <tr><td style="color:#C8C5F0">Typosquatting</td>
+          <td style="color:#FFD700;font-weight:600;text-align:right">
+              0</td></tr>
+      <tr><td style="color:#C8C5F0">Secrets Exposed</td>
+          <td style="color:#9B6FFF;font-weight:600;text-align:right">
+              1</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="sec-t">✦ BY SEVERITY</div>
+    <table>
+      <tr><td style="color:#C8C5F0">Critical</td>
+          <td style="color:#FF2D8B;font-weight:600;text-align:right">
+              0</td></tr>
+      <tr><td style="color:#C8C5F0">High</td>
+          <td style="color:#FF8C42;font-weight:600;text-align:right">
+              2</td></tr>
+      <tr><td style="color:#C8C5F0">Medium</td>
+          <td style="color:#FFD700;font-weight:600;text-align:right">
+              0</td></tr>
+      <tr><td style="color:#C8C5F0">Low</td>
+          <td style="color:#7B78A8;font-weight:600;text-align:right">
+              0</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="sec-t">✦ TECH STACK — LANGUAGES</div>
+  <div><span style="display:inline-block;background:rgba(155,111,255,0.15);color:#9B6FFF;border:1px solid rgba(155,111,255,0.3);border-radius:4px;padding:3px 9px;margin:3px;font-size:11px;">Python</span></div>
+</div>
+
+<div class="card">
+  <div class="sec-t">✦ PACKAGES (6 total)</div>
+  <table>
+    <tr><th>Package</th><th>Version</th></tr>
+    <tr><td style="color:#C8C5F0;">semgrep</td><td style="color:#9B6FFF;font-family:monospace;">see requirements.txt</td></tr><tr><td style="color:#C8C5F0;">openai</td><td style="color:#9B6FFF;font-family:monospace;">see requirements.txt</td></tr><tr><td style="color:#C8C5F0;">anthropic</td><td style="color:#9B6FFF;font-family:monospace;">see requirements.txt</td></tr><tr><td style="color:#C8C5F0;">python-dotenv</td><td style="color:#9B6FFF;font-family:monospace;">see requirements.txt</td></tr><tr><td style="color:#C8C5F0;">requests</td><td style="color:#9B6FFF;font-family:monospace;">see requirements.txt</td></tr><tr><td style="color:#C8C5F0;">python-Levenshtein</td><td style="color:#9B6FFF;font-family:monospace;">see requirements.txt</td></tr>
+  </table>
+  
+</div>
+
+<div class="card">
+  <div class="sec-t">✦ ALL FINDINGS</div>
+  <table>
+    <tr><th>Severity</th><th>File</th><th>Summary</th><th>Source</th><th>Status</th></tr>
+    <tr><td style="color:#FF8C42;font-family:monospace;font-size:9px;white-space:nowrap;">High</td><td style="color:#E8E5FF;font-size:10px;">sample_target/app.py</td><td style="color:#A0A0C8;font-size:10px;">The code contains a hardcoded API key, which is a secret that should not be stored in the source code. This means that anyone with access to the code ...</td><td style="color:#7B78A8;font-size:9px;">core-scanner</td><td style="color:#7B78A8;font-size:9px;">open</td></tr><tr><td style="color:#FF8C42;font-family:monospace;font-size:9px;white-space:nowrap;">High</td><td style="color:#E8E5FF;font-size:10px;">sample_target/app.py</td><td style="color:#A0A0C8;font-size:10px;">The code is using the 'os.system()' function with user input, which could allow an attacker to execute arbitrary system commands....</td><td style="color:#7B78A8;font-size:9px;">core-scanner</td><td style="color:#7B78A8;font-size:9px;">open</td></tr>
+  </table>
+  
+</div>
+
+<div style="text-align:center;padding:14px;font-family:'Press Start 2P',monospace;
+            font-size:8px;border-top:1px solid rgba(155,111,255,0.15);margin-top:10px">
+  <span style="color:#9B6FFF">ctrl</span>+<span style="color:#FF2D8B">alt</span>+<span style="color:#00D9FF">delulu</span>
+  &nbsp;✦&nbsp;
+  <span style="color:#7B78A8;font-size:7px">three women. one scanner. zero jargon.</span>
+</div>
+
+</body>
+</html>

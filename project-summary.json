@@ -1,15 +1,11 @@
 {
-  "meta": {
-    "version": "1.0.0",
-    "created_by": "init_scan_state.py",
-    "created_at": "2026-07-13T12:13:13.381652+00:00",
-    "description": "Shared state file for Ctrl+Alt+Delulu vulnerability scanner. All 6 parts read and write to this file. Do not edit manually."
-  },
+  "generated_at": "2026-07-13T14:32:57.578979+00:00",
+  "generated_by": "Ctrl+Alt+Delulu \u2014 Part 06: Summary Card Generator",
   "project": {
     "name": "ctrl-alt-delulu-scanner",
     "path": "/workspaces/ctrl-alt-delulu",
     "started": "",
-    "ended": "2026-07-13T14:32:57.579011+00:00",
+    "ended": "2026-07-13T14:32:57.578994+00:00",
     "languages": [
       "Python"
     ],
@@ -20,6 +16,41 @@
       "python-dotenv": "see requirements.txt",
       "requests": "see requirements.txt",
       "python-Levenshtein": "see requirements.txt"
+    }
+  },
+  "stack": {
+    "languages": [
+      "Python"
+    ],
+    "total_packages": 6,
+    "packages": {
+      "semgrep": "see requirements.txt",
+      "openai": "see requirements.txt",
+      "anthropic": "see requirements.txt",
+      "python-dotenv": "see requirements.txt",
+      "requests": "see requirements.txt",
+      "python-Levenshtein": "see requirements.txt"
+    }
+  },
+  "security": {
+    "score": 70,
+    "total_findings": 2,
+    "fixed": 0,
+    "open": 2,
+    "dismissed": 0,
+    "by_type": {
+      "vulnerability": 1,
+      "typosquatting": 0,
+      "secret": 1
+    },
+    "by_severity": {
+      "Critical": 0,
+      "High": 2,
+      "Medium": 0,
+      "Low": 0
+    },
+    "by_source": {
+      "core-scanner": 2
     }
   },
   "findings": [
@@ -81,21 +112,5 @@
         ]
       }
     }
-  ],
-  "stats": {
-    "total": 2,
-    "fixed": 0,
-    "open": 2,
-    "by_type": {
-      "vulnerability": 1,
-      "typosquatting": 0,
-      "secret": 1
-    },
-    "by_severity": {
-      "critical": 0,
-      "high": 2,
-      "medium": 0,
-      "low": 0
-    }
-  }
+  ]
 }
