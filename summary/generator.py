@@ -29,6 +29,7 @@ import json
 import os
 import sys
 import argparse
+import html as html_escape
 from datetime import datetime, timezone
 
 # ── Import shared state helpers from core/state.py ───────────────────────────
@@ -365,27 +366,42 @@ def write_html_card(summary, output_dir="."):
             f'<td style="color:#9B6FFF;font-family:monospace;">{version}</td></tr>'
         )
 
-    # Findings rows (first 50)
-    # Reads explanation dict written by Part 02, falls back to message if not yet explained
+    # Findings rows (first 50) — each row is clickable and expands to show
+    # the full explanation (why it matters + how to fix) in a detail row below it
     finding_rows = ""
-    for f in summary["findings"][:50]:
+    for idx, f in enumerate(summary["findings"][:50]):
         sev   = f.get("severity", "Low")
         color = sev_colors.get(sev, "#7B78A8")
-
         explanation = f.get("explanation")
+
         if explanation and isinstance(explanation, dict):
-            display_text = explanation.get("plain_summary", f.get("message", ""))[:150]
+            full_summary = explanation.get("plain_summary", f.get("message", ""))
+            why_it_matters = explanation.get("why_it_matters", "")
+            how_to_fix = explanation.get("how_to_fix", "")
         else:
-            display_text = f.get("message", "")[:150]
+            full_summary = f.get("message", "")
+            why_it_matters = ""
+            how_to_fix = ""
+
+        display_text = full_summary[:150]
+        truncated = len(full_summary) > 150
+        esc = html_escape.escape
 
         finding_rows += (
-            f'<tr>'
-            f'<td style="color:{color};font-family:monospace;font-size:9px;white-space:nowrap;">{sev}</td>'
-            f'<td style="color:#E8E5FF;font-size:10px;">{f.get("file_path","")}</td>'
-            f'<td style="color:#A0A0C8;font-size:10px;">{display_text}...</td>'
-            f'<td style="color:#7B78A8;font-size:9px;">{f.get("source","")}</td>'
-            f'<td style="color:#7B78A8;font-size:9px;">{f.get("status","")}</td>'
+            f'<tr class="finding-row" onclick="toggleFinding({idx})" style="cursor:pointer;">'
+            f'<td style="color:{color};font-family:monospace;font-size:9px;white-space:nowrap;">{esc(sev)}</td>'
+            f'<td style="color:#E8E5FF;font-size:10px;">{esc(f.get("file_path",""))}</td>'
+            f'<td style="color:#A0A0C8;font-size:10px;">{esc(display_text)}{"..." if truncated else ""} '
+            f'<span style="color:#9B6FFF;font-size:9px;">{"click for details" if truncated or why_it_matters or how_to_fix else ""}</span></td>'
+            f'<td style="color:#7B78A8;font-size:9px;">{esc(f.get("source",""))}</td>'
+            f'<td style="color:#7B78A8;font-size:9px;">{esc(f.get("status",""))}</td>'
             f'</tr>'
+            f'<tr id="detail-{idx}" class="detail-row" style="display:none;">'
+            f'<td colspan="5" style="background:#141230;padding:12px 16px;">'
+            f'<div style="color:#E8E5FF;font-size:11px;margin-bottom:8px;"><b style="color:#00D9FF;">What is wrong:</b> {esc(full_summary)}</div>'
+            + (f'<div style="color:#E8E5FF;font-size:11px;margin-bottom:8px;"><b style="color:#FF8C42;">Why it matters:</b> {esc(why_it_matters)}</div>' if why_it_matters else '')
+            + (f'<div style="color:#E8E5FF;font-size:11px;"><b style="color:#00FF88;">How to fix it:</b> {esc(how_to_fix)}</div>' if how_to_fix else '')
+            + f'</td></tr>'
         )
 
     html = f"""<!DOCTYPE html>
@@ -416,8 +432,15 @@ def write_html_card(summary, output_dir="."):
             border:none;border-radius:6px;padding:10px 16px;cursor:pointer;margin-bottom:18px}}
   .dl-btn:hover{{background:#b494ff}}
   @media print{{.dl-btn{{display:none}}}}
+  .finding-row:hover{{background:rgba(155,111,255,0.08)}}
+  .detail-row td{{border-bottom:1px solid rgba(155,111,255,0.15)!important}}
 </style>
 <script>
+function toggleFinding(idx) {{
+  var row = document.getElementById('detail-' + idx);
+  row.style.display = (row.style.display === 'none' || row.style.display === '') ? 'table-row' : 'none';
+}}
+
 function downloadPDF() {{
   var btn = document.querySelector('.dl-btn');
   btn.style.display = 'none';
