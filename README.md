@@ -1,41 +1,31 @@
 # Ctrl+Alt+Delulu
 
-AI-powered vulnerability scanner. Scans code with Semgrep, explains findings in plain language with AI, checks for typosquatted packages, and generates a project summary card.
+> **AI-powered security scanner for developers — built by three women at Hackathon 2026**
+
+Most security tools speak to security engineers. This one speaks to developers. We built an AI layer on top of Semgrep open source that scans your codebase, finds real vulnerabilities, and explains every single one in plain language — what it is, why it's dangerous, and exactly how to fix it. No jargon. No wall of errors. Just answers.
 
 ---
 
-## ✅ Completed Parts
+## The Team
 
-### Part 01 — Core Scanner
-**Owner: Sumaira** · `core/scanner.py`, `core/state.py`, `core/rules/basic-security.yaml`
-
-Wraps the Semgrep OSS CLI. Runs it on any file/folder, returns clean structured findings, writes them into the shared `scan-state.json`. Handles Semgrep's login-gated code-snippet quirk by reading snippets directly from disk. Deduplicates on re-scan — running it twice on unchanged code won't create duplicate findings.
-
-### Part 02 — AI Explanation Layer
-**Owner: Sumaira** · `ai-layer/explain.py`
-
-Takes raw findings and calls an AI API to turn each into a plain-language explanation: what's wrong, why it matters, how to fix it. Defaults to **NVIDIA NIM (free)**, Anthropic/Claude supported as a drop-in alternate. Runs explanations in parallel, auto-retries on malformed AI JSON responses, skips findings that are already explained on re-run.
-
-### Part 04 — Package Name Checker
-**Owner: Tasneem** · `pkg-checker/checker.py`
-
-Detects misspelled/typosquatted package names in `requirements.txt` (PyPI) and `package.json` (npm) using edit-distance matching against known trusted packages. Writes findings into `scan-state.json` in the same format as Part 01, so they're indistinguishable from core-scanner findings to every other part.
-
-### Part 06 — Summary Card Generator
-**Owner: Tasneem** · `summary/generator.py`
-
-Triggered when development ends. Reads everything from `scan-state.json`, detects the project's tech stack, and outputs a full summary in three formats: JSON (machine-readable), TXT (plain text), HTML (styled card, click any finding row to expand full details — added by Sumaira). PDF export via WeasyPrint (see Known environment notes below).
-
-**Shared infrastructure:** `init_scan_state.py` (Tasneem) creates the one shared `scan-state.json` file all parts read/write to. `main.py` (Sumaira) chains Part 01 → Part 02 together.
+| | Name | Parts |
+|---|---|---|
+| 🟣 | **Rabia** | VS Code Extension (Part 03) · Paste Guard (Part 05) |
+| 🩷 | **Sumaira** | Core Scanner (Part 01) · AI Explanation Layer (Part 02) |
+| 🩵 | **Tasneem** | Package Name Checker (Part 04) · Summary Card Generator (Part 06) |
 
 ---
 
-## ⏳ Not Started
+## What It Does
 
-| Part | Owner |
-|---|---|
-| 03 — VS Code Extension | Rabia |
-| 05 — Paste Guard | Rabia |
+| Part | Feature | Status |
+|---|---|---|
+| 01 | **Core Scanner** — scans codebase with Semgrep, finds vulnerabilities | ✅ Done |
+| 02 | **AI Explanation Layer** — rewrites every finding into plain language | ✅ Done |
+| 03 | **VS Code Extension** — surfaces findings inline while you code | 🔜 In progress |
+| 04 | **Package Name Checker** — detects typosquatting before install | ✅ Done |
+| 05 | **Paste Guard** — warns when you paste API keys or secrets | 🔜 In progress |
+| 06 | **Summary Card** — generates a full project security report at the end | ✅ Done |
 
 ---
 
@@ -47,87 +37,152 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Get a free NVIDIA API key: **build.nvidia.com** → sign up → any model → **Get API Key** (starts with `nvapi-`).
+Get a free NVIDIA API key at **build.nvidia.com** — sign up, pick any model, click **Get API Key**. It starts with `nvapi-`.
 
 ```bash
 cp .env.example .env
-# paste your key into NVIDIA_API_KEY=...
+# open .env and paste your key into NVIDIA_API_KEY=
 ```
 
 ---
 
-## First-time setup (run once per clone)
+## First Run
+
+Run this once after cloning — creates the shared `scan-state.json` file all parts use:
 
 ```bash
-python init_scan_state.py --name "ctrl-alt-delulu-scanner"
+python init_scan_state.py --name "your-project-name"
 ```
-Creates `scan-state.json` — required before running any part.
 
 ---
 
-## Run the full pipeline
+## Run the Scanner
 
 ```bash
-python main.py test_project/          # Part 01 + 02: scan + explain
-python pkg-checker/checker.py --file requirements.txt   # Part 04
-python summary/generator.py                             # Part 06
+# Full pipeline — scan + AI explanations
+python main.py test_project/
+
+# Part 04 — check packages for typosquatting
+python pkg-checker/checker.py --file requirements.txt
+
+# Part 06 — generate summary card when done
+python summary/generator.py
 ```
 
-Outputs: `project-summary.json` / `.txt` / `.html` / `.pdf`.
-Open `project-summary.html` — click any row in **ALL FINDINGS** to expand full details.
+Outputs: `project-summary.html` · `project-summary.txt` · `project-summary.json` · `project-summary.pdf`
 
-### Run Part 01/02 only
+Open `project-summary.html` in a browser — click any row in the findings table to expand the full AI explanation.
+
+---
+
+## Additional Options
+
 ```bash
-python main.py path/to/codebase --config auto        # full Semgrep registry
-python main.py path/to/codebase --skip-ai             # scan only, no AI calls
+# Scan only — skip AI calls
+python main.py path/to/code --skip-ai
+
+# Use the full Semgrep registry (more rules, needs internet)
+python main.py path/to/code --config auto
+
+# Check a single package name
+python pkg-checker/checker.py --package requets --ecosystem pypi
+
+# Watch package files for changes
+python pkg-checker/checker.py --watch requirements.txt,package.json
 ```
 
-### Switch to Claude instead of NVIDIA
-In `.env`:
+---
+
+## Switch AI Provider
+
+The scanner defaults to NVIDIA NIM (free tier). To switch to Claude:
+
+```bash
+# In your .env file:
 AI_PROVIDER=anthropic
 ANTHROPIC_API_KEY=your-key-here
-
----
-
-## GitHub / Codespaces
-
-Repo: `github.com/Sumera01/ctrl-alt-delulu`
-
-**Codespaces:** repo page → **Code → Codespaces → Create codespace on main** → run Setup above.
-**Local:** clone → open in VS Code → run Setup above → select `./venv` as interpreter.
-
-**Never commit `.env`** — already gitignored. Only `.env.example` is tracked.
-
----
-
-## What's gitignored (regenerated locally, never committed)
-- `scan-state.json`
-- `findings.json`, `explanations.json`
-- `project-summary.json` / `.txt` / `.html` / `.pdf`
-
----
-
-## Test target
-
-`test_project/` — vulnerable Flask app, 8 vulnerability types (SQL injection, XSS, `eval()` injection, shell injection, weak MD5, insecure pickle, hardcoded AWS key). Catches 16 real findings with `--config auto`.
-
-`core/rules/basic-security.yaml` — small offline ruleset (3 rules), for testing without registry access.
-
----
-
-## Known environment notes
-
-- **PDF export needs system libraries** (WeasyPrint). If you see "PDF skipped":
-```bash
-  sudo apt-get update
-  sudo apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libcairo2 libgdk-pixbuf-2.0-0 libffi-dev
 ```
-- **Re-running a scan is safe** — duplicate findings are automatically deduped; already-explained findings are skipped (no wasted AI calls).
 
 ---
 
-## Notes for Part 03 / Part 05 (Rabia)
+## Test It
 
-- Part 03 should call `scan_into_state()` (`core/scanner.py`) on save, then `explain_finding()` (`ai-layer/explain.py`) for inline messages.
-- All state read/write goes through `core/state.py` — use `load_state()`, `add_findings()`, `attach_explanation()`, `unexplained_findings()`.
-- Part 05 is fully standalone — no dependency on Parts 01/02/04/06.
+`test_project/` contains a deliberately vulnerable Flask app with 8 vulnerability types — SQL injection, XSS, `eval()` injection, shell injection, weak MD5 hashing, insecure pickle, hardcoded AWS key, and command injection. Running the full pipeline on it catches 16 real findings.
+
+```bash
+python main.py test_project/
+```
+
+`core/rules/basic-security.yaml` is a small offline ruleset (3 rules) for testing without internet access.
+
+---
+
+## Repo Structure
+
+```
+ctrl-alt-delulu/
+├── core/                   # Part 01 — scanner + shared state logic
+│   ├── scanner.py
+│   ├── state.py
+│   └── rules/
+├── ai-layer/               # Part 02 — AI explanation engine
+│   └── explain.py
+├── pkg-checker/            # Part 04 — package name checker
+│   └── checker.py
+├── summary/                # Part 06 — summary card generator
+│   └── generator.py
+├── test_project/           # Vulnerable test app
+├── init_scan_state.py      # Run once to initialise scan-state.json
+├── main.py                 # Chains Part 01 + Part 02
+├── .env.example
+└── requirements.txt
+```
+
+---
+
+## How the Parts Connect
+
+All six parts share a single file — `scan-state.json` — at the repo root. Parts 01, 04, and 05 write findings into it. Parts 02 and 03 read from it to explain and display results. Part 06 reads everything to build the final summary. This file is never committed to GitHub — it's generated locally by `init_scan_state.py`.
+
+---
+
+## PDF Export
+
+WeasyPrint is used for PDF generation. If you see `PDF skipped`, install the system dependencies:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libcairo2 libgdk-pixbuf-2.0-0 libffi-dev
+```
+
+---
+
+## Notes for Rabia — Parts 03 + 05
+
+**Part 03 (VS Code Extension)**
+- Call `scan_into_state()` from `core/scanner.py` on file save
+- Call `explain_finding()` from `ai-layer/explain.py` for inline display
+- All state operations go through `core/state.py` — use `load_state()`, `add_findings()`, `attach_explanation()`, `unexplained_findings()`
+
+**Part 05 (Paste Guard)**
+- Fully standalone — no dependency on any other part
+- On paste event: scan content for keys/secrets, show warning popup, write finding with `type: "secret"` and `source: "part-5"` to `scan-state.json` using `core/state.py`
+
+---
+
+## Files Never Committed
+
+```
+.env
+scan-state.json
+project-summary.json
+project-summary.txt
+project-summary.html
+project-summary.pdf
+```
+
+All already covered in `.gitignore`.
+
+---
+
+*ctrl+alt+delulu — three women. one scanner. zero jargon.*
