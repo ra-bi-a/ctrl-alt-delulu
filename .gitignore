@@ -17,6 +17,7 @@ explanations.json
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
+!.vscode/settings.json
 scan-state.json
 project-summary.json
 project-summary.txt
