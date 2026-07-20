@@ -120,6 +120,7 @@ SECRET_PATTERNS = [
 ENTROPY_MIN_LENGTH = 20
 ENTROPY_THRESHOLD = 4.3  # bits/char — random base64/hex sits ~4.0-4.5, English prose ~3.5-4.0
 _CANDIDATE_TOKEN = re.compile(r"['\"]([A-Za-z0-9+/_=.-]{20,})['\"]")
+_BARE_TOKEN_CHARSET = re.compile(r"[A-Za-z0-9+/_=.-]+")
 
 
 def _shannon_entropy(s: str) -> float:
@@ -131,12 +132,36 @@ def _shannon_entropy(s: str) -> float:
 
 
 def _find_high_entropy_strings(text: str):
+    """Finds candidate secrets that appear as quoted strings in actual code,
+    e.g. `api_key = "abc123..."`. Requires quotes on purpose — see
+    _bare_token_if_high_entropy() for the no-quotes case."""
     for match in _CANDIDATE_TOKEN.finditer(text):
         token = match.group(1)
         if len(token) < ENTROPY_MIN_LENGTH:
             continue
         if _shannon_entropy(token) >= ENTROPY_THRESHOLD:
             yield match, token
+
+
+def _bare_token_if_high_entropy(text: str):
+    """Handles someone pasting *just* a secret with nothing else around it —
+    e.g. copying an API key by itself and hitting paste with no code
+    context at all. _find_high_entropy_strings() above requires quotes,
+    which a bare paste like this will never have, so without this check
+    it's invisible to every rule except the provider-specific ones (AWS,
+    GitHub, etc formats). Deliberately conservative: only fires when the
+    *entire* pasted content, once trimmed, is a single token with no
+    whitespace — a real code paste practically never looks like that, so
+    this shouldn't fire on normal pastes, only on "just the secret" ones.
+    """
+    stripped = text.strip()
+    if not (ENTROPY_MIN_LENGTH <= len(stripped) <= 200):
+        return None
+    if not _BARE_TOKEN_CHARSET.fullmatch(stripped):
+        return None
+    if _shannon_entropy(stripped) < ENTROPY_THRESHOLD:
+        return None
+    return stripped
 
 
 # ── Finding builder — matches core/state.py's format exactly ─────────────────
@@ -233,6 +258,18 @@ def check_paste(text, file_path=None, line=None, state=None):
             claim_id(), "high-entropy-string", "Possible hardcoded secret (high-entropy string)",
             "Medium", token, snippet_line, file_path, line,
         ))
+
+    # Only check the "bare token, no code context" case if nothing above
+    # already caught this paste — avoids a duplicate finding when e.g. an
+    # AKIA-format key was pasted bare (already caught by its own pattern).
+    if not findings:
+        bare_token = _bare_token_if_high_entropy(text)
+        if bare_token:
+            findings.append(_build_finding(
+                claim_id(), "bare-high-entropy-token",
+                "Possible hardcoded secret (unlabeled token, no surrounding code)",
+                "Medium", bare_token, 1, file_path, line,
+            ))
 
     return findings
 
