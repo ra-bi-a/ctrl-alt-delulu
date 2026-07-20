@@ -44,7 +44,7 @@ async function handleSave(document: vscode.TextDocument, diagnostics: FindingsDi
   }
 
   if (MANIFEST_FILES.has(fileName)) {
-    await runPackageCheck(relativePath, diagnostics);
+    await runPackageCheck(relativePath, workspaceRoot, diagnostics);
     return;
   }
 
@@ -56,11 +56,15 @@ async function handleSave(document: vscode.TextDocument, diagnostics: FindingsDi
   await runCoreScan(relativePath, workspaceRoot, diagnostics);
 }
 
-async function runPackageCheck(relativePath: string, diagnostics: FindingsDiagnostics) {
+async function runPackageCheck(relativePath: string, workspaceRoot: string, diagnostics: FindingsDiagnostics) {
   try {
     await vscode.window.withProgress(
       { location: vscode.ProgressLocation.Window, title: 'Ctrl+Alt+Delulu: checking packages…' },
-      () => runPython(getCheckerScriptPath(), { args: ['--file', relativePath, '--state', getStatePath()] })
+      () =>
+        runPython(getCheckerScriptPath(), {
+          args: ['--file', relativePath, '--state', getStatePath()],
+          cwd: workspaceRoot,
+        })
     );
   } catch (err) {
     // Fail open: a broken/missing Python environment shouldn't block editing.
